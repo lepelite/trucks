@@ -3,6 +3,7 @@ package models
 import (
 	"bufio"
 	"fmt"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -43,15 +44,18 @@ func NewLoads(evalFile string) []Load {
 		}
 	}()
 	s := bufio.NewScanner(f)
-	i := 0
 	loads := make([]Load, 0)
 	s.Scan() // Consume column header
-	s.Text() // Consume column header
 	for s.Scan() {
 		line := s.Text()
+		if strings.TrimSpace(line) == "" {
+			continue
+		}
 		load := ParseLoad(line)
 		loads = append(loads, load)
-		i++
+	}
+	if err := s.Err(); err != nil {
+		panic(fmt.Errorf("read manifest %s: %w", evalFile, err))
 	}
 	return loads
 }
@@ -89,6 +93,9 @@ func ParsePoint(s string) Point {
 	y, err := strconv.ParseFloat(xy[1], 64)
 	if err != nil {
 		panic(fmt.Sprintf("Could not convert %s to float", xy[1]))
+	}
+	if math.IsNaN(x) || math.IsInf(x, 0) || math.IsNaN(y) || math.IsInf(y, 0) {
+		panic(fmt.Sprintf("Point must contain finite coordinates: %s", s))
 	}
 	return NewPoint(x, y)
 }
