@@ -40,6 +40,9 @@ func Route(loads []models.Load, r float64) [][]int64 {
 	if len(newLoads) < 1 {
 		panic("No loads")
 	}
+	if len(newLoads) == 1 {
+		return [][]int64{{newLoads[0].Id}}
+	}
 	nextIdx := RandomIndex(newLoads)
 	lastLoad := newLoads[nextIdx]
 	lastLoadEnd := lastLoad.End
@@ -148,7 +151,7 @@ func ClosestIdx(pt models.Point, loads []models.Load) int {
 }
 
 func Cost(routes [][]int64, loads []models.Load) float64 {
-	c := 500.0 * float64(len(routes))
+	c := 500.0 * float64(len(routes)-1)
 	for _, r := range routes {
 		c += RouteDistance(r, loads)
 	}

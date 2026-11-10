@@ -159,10 +159,9 @@ if __name__ == '__main__':
         print("\trunning...")
         inputPath = args.problemDir + "/" + inputFile
         #run commands on input path
-        cmd = args.cmd.split()
-        cmd.append(inputPath)
+        cmd = args.cmd + " " + inputPath
         startTime = time.time()
-        output = subprocess.check_output(cmd).decode("utf-8")
+        output = subprocess.check_output(cmd, shell=True).decode("utf-8")
         runTime = time.time() - startTime
         print("\trun time:", runTime, "s")
         if runTime > 30:
@@ -172,7 +171,7 @@ if __name__ == '__main__':
         print("\tevaluating solution...")
         problem = loadProblemFromFile(inputPath)
         schedules, err = loadSolutionFromString(output)
-        if err != "":
+        if (err != "") == True:
             print(err)
             printSolutionFormatNag()
             print("Observed:")
